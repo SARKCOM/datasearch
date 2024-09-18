@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Search</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+        }
+        th, td {
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Data Search</h1>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter Name">
+
+    <label for="contract_no">Contract Number:</label>
+    <input type="text" id="contract_no" placeholder="Enter Contract Number">
+
+    <label for="folio_no">Folio Number:</label>
+    <input type="text" id="folio_no" placeholder="Enter Folio Number">
+
+    <label for="mobile_no">Mobile Number:</label>
+    <input type="text" id="mobile_no" placeholder="Enter Mobile Number">
+
+    <label for="village">Village:</label>
+    <input type="text" id="village" placeholder="Enter Village">
+
+    <label for="dealer">Dealer:</label>
+    <input type="text" id="dealer" placeholder="Enter Dealer">
+
+    <button onclick="searchData()">Search</button>
+
+    <h2>Search Results</h2>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Contract Number</th>
+                <th>Folio Number</th>
+                <th>Mobile Number</th>
+                <th>Village</th>
+                <th>Dealer</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Search results will appear here -->
+        </tbody>
+    </table>
+
+    <script>
+        let data = [];
+
+        // Fetch the JSON data from the file
+        fetch('data_output.json') // Replace with the actual path to your JSON file
+            .then(response => response.json())
+            .then(jsonData => {
+                data = jsonData;  // Store the fetched data into the 'data' variable
+            })
+            .catch(error => console.error('Error loading JSON:', error));
+
+        function searchData() {
+            const name = document.getElementById('name').value.toLowerCase();
+            const contractNo = document.getElementById('contract_no').value;
+            const folioNo = document.getElementById('folio_no').value;
+            const mobileNo = document.getElementById('mobile_no').value;
+            const village = document.getElementById('village').value.toLowerCase();
+            const dealer = document.getElementById('dealer').value.toLowerCase();
+
+            const results = data.filter(item => {
+                return (
+                    (!name || item.Name.toLowerCase().includes(name)) &&
+                    (!contractNo || item['Contract Number'].includes(contractNo)) &&
+                    (!folioNo || item['Folio no'].includes(folioNo)) &&
+                    (!mobileNo || item['Mobile No'].toString().includes(mobileNo)) &&
+                    (!village || item.Village.toLowerCase().includes(village)) &&
+                    (!dealer || item.Dealer.toLowerCase().includes(dealer))
+                );
+            });
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            results.forEach(result => {
+                const row = document.createElement('tr');
+
+                for (let key in result) {
+                    if (result[key] !== "" && result[key] !== null) {  // Only display non-empty columns
+                        const cell = document.createElement('td');
+                        cell.textContent = result[key];
+                        row.appendChild(cell);
+                    }
+                }
+
+                resultsBody.appendChild(row);
+            });
+        }
+    </script>
+
+</body>
+</html>
